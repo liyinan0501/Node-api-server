@@ -1,9 +1,14 @@
+// 导入数据库操作模块
 const db = require('../db/index')
+// 导入 bcryptjs 加密包
 const bcrypt = require('bcryptjs')
+// 导入生成 Token 的包
+const jwt = require('jsonwebtoken')
+const config = require('../config')
 
 // 注册新用户的处理函数
 exports.regUser = (req, res) => {
-  // 获取客户端提交到服务器的用户信息
+  // 获取客户端提交到服务器的表单用户信息
   const userInfo = req.body
   // 对表单数据，进行合法性校验。
   // if (!userInfo.username || !userInfo.password) {
@@ -57,5 +62,34 @@ exports.regUser = (req, res) => {
 
 // 登录的处理函数
 exports.login = (req, res) => {
-  res.send('login OK')
+  // 获取客户端提交到服务器的表单用户信息
+  const userInfo = req.body
+
+  const sqlStr = 'select * from ev_users where username = ?'
+  db.query(sqlStr, userInfo.username, function (err, results) {
+    // 执行 SQL 语句失败
+    if (err) return res.cc(err)
+    // 执行 SQL 语句成功，但是查询到数据条数不等于 1。
+    if (results.length !== 1) return res.cc('登录失败')
+
+    // 判断表单密码是否正确
+    // bcrypt.compareSync(用户提交的密码, 数据库中的密码)
+    const compareResult = bcrypt.compareSync(
+      userInfo.password,
+      results[0].password
+    )
+    if (!compareResult) return res.cc('密码不正确')
+
+    // 在服务器端生成 Token 字符串：
+    // 剔除完毕之后，user 中只保留了用户的 id, username, nickname, email 这四个属性的值
+    const user = { ...results[0], password: '', user_pic: '' }
+    const token = jwt.sign(user, config.jwtSecretKey, {
+      expiresIn: config.expiresIn,
+    })
+    res.send({
+      status: 200,
+      message: 'Login Succeeds!',
+      token: 'Bearer ' + token,
+    })
+  })
 }

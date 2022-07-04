@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 const Joi = require('joi')
+const config = require('./config')
+const { expressjwt } = require('express-jwt')
 
 const cors = require('cors')
 app.use(cors())
@@ -20,6 +22,13 @@ app.use((req, res, next) => {
   next()
 })
 
+// 必须在路由之前，配置解析Token的中间件。
+app.use(
+  expressjwt({ secret: config.jwtSecretKey, algorithms: ['HS256'] }).unless({
+    path: [/^\/api\//],
+  })
+)
+
 // 导入并使用用户路由模块
 const userRouter = require('./router/user')
 app.use('/api', userRouter)
@@ -28,6 +37,8 @@ app.use('/api', userRouter)
 app.use((err, req, res, next) => {
   // 验证失败导致的错误
   if (err instanceof Joi.ValidationError) return res.cc(err)
+  // 捕获身份认证失败的错误
+  if (err.name === 'UnauthorizedError') return res.cc('身份认证失败！')
   // 未知错误
   res.cc(err)
   next()
