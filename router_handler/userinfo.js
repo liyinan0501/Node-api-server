@@ -1,7 +1,6 @@
 const db = require('../db/index')
 const bcrypt = require('bcryptjs')
-const { login } = require('./user')
-const { response } = require('express')
+
 // 获取用户信息处理模块
 //! 注意：为了防止用户的密码泄露，需要排除 password 字段
 exports.getUserinfo = (req, res) => {
@@ -16,7 +15,7 @@ exports.getUserinfo = (req, res) => {
     res.send({
       status: 0,
       message: '获取用户成功',
-      data: result[0],
+      data: results[0],
     })
   })
 }
@@ -35,6 +34,7 @@ exports.updateUserinfo = (req, res) => {
   })
 }
 
+// 更改用户密码的处理函数
 exports.updatePassword = (req, res) => {
   const sqlStr = 'select * from ev_users where id = ?'
   // 执行 SQL 语句查询用户是否存在
@@ -44,6 +44,7 @@ exports.updatePassword = (req, res) => {
     // 2. 执行 SQL 语句成功，但是查询到的数据条数不等于 1，未找到该用户。
     if (results.length !== 1) return res.cc('未找到该用户，密码重置失效！')
     // 3. 判断原密码是否正确
+    // bcrypt.compareSync(用户提交的未加密的原始密码, 数据库中已机密的原始密码)
     const compareResult = bcrypt.compareSync(
       req.body.oldPwd,
       results[0].password
@@ -51,7 +52,9 @@ exports.updatePassword = (req, res) => {
     if (!compareResult) return res.cc('原密码验证失败')
 
     const sqlStr1 = 'update ev_users set password = ? where id = ?'
+    // 对新密码进行加密处理
     req.body.newPwd = bcrypt.hashSync(req.body.newPwd, 10)
+    // 原始密码验证成功后，执行SQL。
     db.query(sqlStr1, [req.body.newPwd, req.auth.id], (err, results) => {
       // 1. 执行 SQL 语句失败
       if (err) return res.cc(err)

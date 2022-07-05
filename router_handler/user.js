@@ -66,14 +66,15 @@ exports.login = (req, res) => {
   const userInfo = req.body
 
   const sqlStr = 'select * from ev_users where username = ?'
+  // 判断表单用户名是否存在
   db.query(sqlStr, userInfo.username, function (err, results) {
     // 执行 SQL 语句失败
     if (err) return res.cc(err)
     // 执行 SQL 语句成功，但是查询到数据条数不等于 1。
     if (results.length !== 1) return res.cc('登录失败')
 
-    // 判断表单密码是否正确
-    // bcrypt.compareSync(用户提交的密码, 数据库中的密码)
+    // 表单用户名正确后，判断表单密码是否正确。
+    // bcrypt.compareSync(用户提交的未加密的密码, 数据库中已机密的密码)
     const compareResult = bcrypt.compareSync(
       userInfo.password,
       results[0].password
@@ -81,7 +82,7 @@ exports.login = (req, res) => {
     if (!compareResult) return res.cc('密码不正确')
 
     // 在服务器端生成 Token 字符串：
-    // 剔除完毕之后，user 中只保留了用户的 id, username, nickname, email 这四个属性的值
+    // 剔除完毕之后，user 中只保留了用户的 id, username, nickname, email 这四个属性的值，用于生成 Token 字符串。
     const user = { ...results[0], password: '', user_pic: '' }
     const token = jwt.sign(user, config.jwtSecretKey, {
       expiresIn: config.expiresIn,
