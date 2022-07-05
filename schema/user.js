@@ -9,17 +9,30 @@ const Joi = require('joi')
  * pattern(正则表达式) 值必须符合正则表达式的规则
  */
 
-// 用户名的验证规则
+// 用户名和密码的验证规则
 const username = Joi.string().alphanum().min(1).max(10).required()
-// 密码的验证规则
 const password = Joi.string()
   .pattern(/^[\S]{6,12}$/)
   .required()
 
-// 注册和登录表单的验证规则对象
+// id, nickname, email 的验证规则
+const id = Joi.number().integer().min(1).required()
+const nickname = Joi.string().required()
+const email = Joi.string().email().required()
+
+// 验证规则对象-注册和登录表单
 exports.reg_login_schema = {
   body: {
     username,
     password,
+  },
+}
+
+// 验证规则对象-更新用户基本信息
+exports.update_userinfo_schema = {
+  body: {
+    id,
+    nickname,
+    email,
   },
 }
