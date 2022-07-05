@@ -36,3 +36,11 @@ exports.update_userinfo_schema = {
     email,
   },
 }
+
+// 验证规则对象-更改用户密码
+exports.update_password_schema = {
+  body: {
+    oldPwd: password,
+    newPwd: Joi.not(Joi.ref('oldPwd')).concat(password),
+  },
+}
