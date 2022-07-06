@@ -4,6 +4,7 @@ const expressJoi = require('@escook/express-joi')
 const {
   update_userinfo_schema,
   update_password_schema,
+  update_avatar_schema,
 } = require('../schema/user')
 
 // 导入路由处理函数模块
@@ -22,5 +23,10 @@ router.post(
   expressJoi(update_password_schema),
   userinfo_handler.updatePassword
 )
-
+router.post(
+  '/update/avatar',
+  expressJoi(update_avatar_schema),
+  userinfo_handler.updateAvatar
+)
+// 更新用户头像的路由
 module.exports = router

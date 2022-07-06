@@ -20,6 +20,10 @@ const id = Joi.number().integer().min(1).required()
 const nickname = Joi.string().required()
 const email = Joi.string().email().required()
 
+// avatar 头像的验证规则
+// example dataUri:data:image/png;base64,VE9PTUFOWVNFQ1JFVFM=
+const avatar = Joi.string().dataUri().required()
+
 // 验证规则对象-注册和登录表单
 exports.reg_login_schema = {
   body: {
@@ -42,5 +46,12 @@ exports.update_password_schema = {
   body: {
     oldPwd: password,
     newPwd: Joi.not(Joi.ref('oldPwd')).concat(password),
+  },
+}
+
+// 验证规则对象-更改用户头像
+exports.update_avatar_schema = {
+  body: {
+    avatar,
   },
 }

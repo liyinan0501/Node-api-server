@@ -58,11 +58,23 @@ exports.updatePassword = (req, res) => {
     db.query(sqlStr1, [req.body.newPwd, req.auth.id], (err, results) => {
       // 1. 执行 SQL 语句失败
       if (err) return res.cc(err)
-      // 2. 执行 SQL 语句成功，但是查询到的数据条数不等于 1。
+      // 2. 执行 SQL 语句成功，影响行数不等于 1。
       if (results.affectedRows !== 1)
         return res.cc('未找到该用户，更新用户信息失败！')
       // 3. 将密码修改成功的信息响应给客户端
       return res.cc('密码修改成功')
     })
+  })
+}
+
+// 更改头像的处理函数
+exports.updateAvatar = (req, res) => {
+  const sqlStr = 'update ev_users set user_pic = ? where id = ?'
+  db.query(sqlStr, [req.body.avatar, req.auth.id], (err, results) => {
+    // 1. 执行 SQL 语句失败
+    if (err) return res.cc(err)
+    // 2. 执行 SQL 语句成功，影响行数不等于 1。
+    if (results.affectedRows !== 1) return res.cc('更新头像失败！')
+    return res.cc('头像修改成功')
   })
 }

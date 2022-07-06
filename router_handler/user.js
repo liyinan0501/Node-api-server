@@ -67,7 +67,7 @@ exports.login = (req, res) => {
 
   const sqlStr = 'select * from ev_users where username = ?'
   // 判断表单用户名是否存在
-  db.query(sqlStr, userInfo.username, function (err, results) {
+  db.query(sqlStr, [userInfo.username], function (err, results) {
     // 执行 SQL 语句失败
     if (err) return res.cc(err)
     // 执行 SQL 语句成功，但是查询到数据条数不等于 1。
