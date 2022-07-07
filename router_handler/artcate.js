@@ -50,3 +50,27 @@ exports.addArticleCate = (req, res) => {
     )
   })
 }
+
+// 删除文章分类的处理函数
+exports.deleteArticleCateById = (req, res) => {
+  const sqlStr = 'update ev_article_cate set is_delete = 1 where id = ?'
+  db.query(sqlStr, [req.params.id], (err, results) => {
+    if (err) return res.cc(err)
+    if (results.affectedRows !== 1) return res.cc('删除失败，稍后再试。')
+    return res.cc('deleting article category succeeds!', 0)
+  })
+}
+
+// 查找文章分类的处理函数
+exports.getArticleCateById = (req, res) => {
+  const sqlStr = 'select * from ev_article_cate where id = ?'
+  db.query(sqlStr, [req.params.id], (err, results) => {
+    if (err) return res.cc(err)
+    if (results.length !== 1) return res.cc('未找到该分类')
+    return res.send({
+      status: 0,
+      message: '查询分类成功',
+      data: results[0],
+    })
+  })
+}

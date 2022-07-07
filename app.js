@@ -39,7 +39,7 @@ app.use('/my', userinfoRouter)
 const artCateRouter = require('./router/artcate')
 app.use('/my/article', artCateRouter)
 
-// 必须在路由之后，定义 Joi 错误级别的中间件
+// 必须在路由之后，校验 Joi 和 验证 Token 错误级别的中间件。
 app.use((err, req, res, next) => {
   // 验证失败导致的错误
   if (err instanceof Joi.ValidationError) return res.cc(err)
