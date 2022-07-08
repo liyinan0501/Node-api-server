@@ -6,6 +6,7 @@ const {
   add_articleCate_schema,
   delete_articleCate_schema,
   get_articleCate_schema,
+  update_articleCate_schema,
 } = require('../schema/artcate')
 
 // 获取文章分类列表的路由
@@ -30,6 +31,13 @@ router.get(
   '/cates/:id',
   expressJoi(get_articleCate_schema),
   artcate_handler.getArticleCateById
+)
+
+// 更新文章分类的路由
+router.post(
+  '/updatecate',
+  expressJoi(update_articleCate_schema),
+  artcate_handler.updateArticleCateById
 )
 
 module.exports = router

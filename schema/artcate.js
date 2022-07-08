@@ -27,3 +27,12 @@ exports.get_articleCate_schema = {
     id,
   },
 }
+
+// 验证规则对象-更新文章分类
+exports.update_articleCate_schema = {
+  body: {
+    Id: id,
+    name,
+    alias,
+  },
+}

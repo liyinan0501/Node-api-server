@@ -74,3 +74,31 @@ exports.getArticleCateById = (req, res) => {
     })
   })
 }
+
+// 更新文章分类的处理函数
+exports.updateArticleCateById = (req, res) => {
+  const { Id, name, alias } = req.body
+  // 定义查重的 SQL 语句
+  const sqlStr =
+    'select * from ev_article_cate where id <> ? and (name = ? or alias = ?)'
+  db.query(sqlStr, [Id, name, alias], (err, results) => {
+    if (err) return res.cc(err)
+    if (results.length === 2) return res.cc('名称和别名都被占用')
+    if (
+      results.length === 1 &&
+      results[0].name === name &&
+      results[0].alias === alias
+    )
+      return res.cc('名称和别名都被占用')
+    if (results.length === 1 && results[0].name === name)
+      return res.cc('名称被占用')
+    if (results.length === 1 && results[0].alias === alias)
+      return res.cc('别名被占用')
+    const sqlStr1 = 'update ev_article_cate set ? where id = ? '
+    db.query(sqlStr1, [{ name, alias }, Id], (err, results) => {
+      if (err) return res.cc(err)
+      if (results.affectedRows !== 1) return res.cc('修改文章分类失败')
+      res.cc('修改文章分类成功', 0)
+    })
+  })
+}

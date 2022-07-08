@@ -38,6 +38,9 @@ app.use('/my', userinfoRouter)
 // 导入并使用文字分类列表路由模块
 const artCateRouter = require('./router/artcate')
 app.use('/my/article', artCateRouter)
+// 导入并使用文章的路由模块
+const articleRouter = require('./router/article')
+app.use('/my/article', articleRouter)
 
 // 必须在路由之后，校验 Joi 和 验证 Token 错误级别的中间件。
 app.use((err, req, res, next) => {
