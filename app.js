@@ -10,6 +10,9 @@ app.use(cors())
 // 只能解析x-www-form-urlencoded表单数据
 app.use(express.urlencoded({ extended: false }))
 
+// 托管静态资源文件
+app.use('/uploads', express.static('./uploads'))
+
 // 必须在路由之前，封装处理错误的res.cc函数中间件。
 app.use((req, res, next) => {
   // status默认等于1意味着失败
